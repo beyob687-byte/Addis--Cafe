@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from './auth/AuthProvider';
+import { useAuth } from './auth/useAuth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ const Login = () => {
     e.preventDefault();
     if (username.trim()) {
       login(username);
-      // Send them back to the page they tried to visit when they were redirected to the login page.
       navigate(from, { replace: true });
     }
   };

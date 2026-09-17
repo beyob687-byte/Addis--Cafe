@@ -1,23 +1,21 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Card from './Card';
-import { CartContext } from './cart/CartProvider';
+import { useCartStore } from './cart/cartStore';
 
 const Dish = ({ dish, currency = 'ETB' }) => {
   const { name, price, isSpicy, id } = dish;
-  const { dispatch, items } = useContext(CartContext);
+  
+  const addItem = useCartStore((state) => state.addItem);
+  const removeItem = useCartStore((state) => state.removeItem);
+  const count = useCartStore((state) => {
+    const item = state.items.find(i => i.id === dish.id);
+    return item ? item.quantity : 0;
+  });
 
-  const cartItem = items.find(item => item.id === dish.id);
-  const count = cartItem ? cartItem.quantity : 0;
-
-  const handleAdd = () => {
-    dispatch({ type: 'ADD_ITEM', payload: dish });
-  };
-
-  const handleRemove = () => {
-    dispatch({ type: 'REMOVE_ITEM', payload: dish });
-  };
+  const handleAdd = () => addItem(dish);
+  const handleRemove = () => removeItem(dish);
 
   return (
     <Card>

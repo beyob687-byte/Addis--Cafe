@@ -1,9 +1,16 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import OrderForm from './OrderForm';
-import { CartContext } from './cart/CartProvider';
+import { useCartStore } from './cart/cartStore';
 
 const Checkout = () => {
-  const { totalPrice, items } = useContext(CartContext);
+  const items = useCartStore((state) => state.items);
+  const clearCart = useCartStore((state) => state.clearCart);
+  
+  const totalPrice = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+  const handleOrderSuccess = () => {
+    clearCart();
+  };
 
   return (
     <div className="checkout-container" style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
@@ -25,7 +32,7 @@ const Checkout = () => {
             </ul>
             <h4 style={{ textAlign: 'right', marginTop: '1rem' }}>Total: {totalPrice} ETB</h4>
           </div>
-          <OrderForm />
+          <OrderForm onSubmitSuccess={handleOrderSuccess} />
         </>
       )}
     </div>

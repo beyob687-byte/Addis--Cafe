@@ -1,10 +1,8 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { CartContext } from './cart/CartProvider';
+import CartBadge from './CartBadge';
 
 const Header = () => {
-  const { totalCount } = useContext(CartContext);
-
   const navStyle = ({ isActive }) => ({
     marginRight: '1rem',
     textDecoration: 'none',
@@ -22,7 +20,7 @@ const Header = () => {
         <NavLink to="/" style={navStyle}>Home</NavLink>
         <NavLink to="/menu" style={navStyle}>Menu</NavLink>
         <NavLink to="/checkout" style={navStyle}>
-          Checkout ({totalCount})
+          Checkout <CartBadge />
         </NavLink>
       </nav>
     </header>

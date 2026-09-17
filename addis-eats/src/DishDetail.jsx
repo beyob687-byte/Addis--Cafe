@@ -1,12 +1,18 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from './hooks/useFetch';
-import { CartContext } from './cart/CartProvider';
+import { useCartStore } from './cart/cartStore';
 
 const DishDetail = () => {
   const { id } = useParams();
   const { data: dishes, loading, error } = useFetch('/dishes.json');
-  const { dispatch, items } = useContext(CartContext);
+  
+  const addItem = useCartStore((state) => state.addItem);
+  const removeItem = useCartStore((state) => state.removeItem);
+  const count = useCartStore((state) => {
+    const item = state.items.find(i => i.id === parseInt(id, 10));
+    return item ? item.quantity : 0;
+  });
 
   if (loading) return <p style={{ padding: '2rem', textAlign: 'center' }}>Loading dish...</p>;
   if (error) return <p style={{ padding: '2rem', textAlign: 'center', color: 'red' }}>Error: {error}</p>;
@@ -22,9 +28,6 @@ const DishDetail = () => {
     );
   }
 
-  const cartItem = items.find(item => item.id === dish.id);
-  const count = cartItem ? cartItem.quantity : 0;
-
   return (
     <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '1rem' }}>
       <Link to="/menu" style={{ display: 'inline-block', marginBottom: '1rem', color: '#3498db' }}>&larr; Back to Menu</Link>
@@ -35,7 +38,7 @@ const DishDetail = () => {
         
         <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button 
-            onClick={() => dispatch({ type: 'ADD_ITEM', payload: dish })}
+            onClick={() => addItem(dish)}
             style={{ padding: '0.75rem 1.5rem', background: '#2ecc71', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
           >
             Add to Cart
@@ -44,7 +47,7 @@ const DishDetail = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span>{count} in cart</span>
               <button 
-                onClick={() => dispatch({ type: 'REMOVE_ITEM', payload: dish })}
+                onClick={() => removeItem(dish)}
                 style={{ padding: '0.5rem 1rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               >
                 Remove One

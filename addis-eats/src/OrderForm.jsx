@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const OrderForm = () => {
+const OrderForm = ({ onSubmitSuccess }) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -22,7 +22,7 @@ const OrderForm = () => {
     e.preventDefault();
     if (isValid) {
       alert(`Order submitted for ${formData.name}!`);
-      // Reset or handle further if needed
+      if (onSubmitSuccess) onSubmitSuccess();
       setFormData({ name: '', phone: '', area: '' });
     }
   };
