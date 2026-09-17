@@ -1,55 +1,87 @@
-import React, { useState } from 'react';
-import Dish from './Dish';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import CategoryBar from './CategoryBar';
-import OrderForm from './OrderForm';
-import { menuData, categories } from './data';
+import DishList from './DishList';
+import { useFetch } from './hooks/useFetch';
+import { categories } from './data';
 
 const Menu = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [orderTotal, setOrderTotal] = useState(0);
+  const { data: dishes, loading, error } = useFetch('/dishes.json');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCategory = searchParams.get('category') || 'All';
 
-  const filteredDishes = menuData.filter((dish) => {
-    if (selectedCategory === 'All') return true;
-    return dish.category === selectedCategory;
-  });
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const searchInputRef = useRef(null);
 
-  const handleAddToCart = (price) => {
-    setOrderTotal((prev) => prev + price);
+  useEffect(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, []);
+
+  const handleCategorySelect = (category) => {
+    if (category === 'All') {
+      searchParams.delete('category');
+    } else {
+      searchParams.set('category', category);
+    }
+    setSearchParams(searchParams);
   };
+
+  const filteredDishes = useMemo(() => {
+    if (!dishes) return [];
+    if (selectedCategory === 'All') return dishes;
+    return dishes.filter(dish => dish.category === selectedCategory);
+  }, [dishes, selectedCategory]);
+
+  if (loading && (!dishes || dishes.length === 0)) {
+    return (
+      <main className="menu-container">
+        <h2 className="menu-title">Our Menu</h2>
+        <div className="loading-state">
+          <p>Loading menu...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="menu-container">
+        <h2 className="menu-title">Our Menu</h2>
+        <div className="error-state" style={{ color: 'red' }}>
+          <p>Error: {error}</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="menu-container">
       <h2 className="menu-title">Our Menu</h2>
       
+      <div className="search-container" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+        <input
+          type="text"
+          ref={searchInputRef}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search dishes..."
+          style={{ padding: '0.5rem', width: '80%', maxWidth: '400px', borderRadius: '4px', border: '1px solid #ccc' }}
+        />
+      </div>
+
       <CategoryBar 
         categories={categories} 
         selectedCategory={selectedCategory} 
-        onSelect={setSelectedCategory} 
+        onSelect={handleCategorySelect} 
       />
 
-      {filteredDishes.length === 0 ? (
-        <div className="empty-state">
-          <p>No items available in this category.</p>
-        </div>
-      ) : (
-        <div className="dishes-grid">
-          {filteredDishes.map((dish) => (
-            <Dish
-              key={dish.id}
-              name={dish.name}
-              price={dish.price}
-              isSpicy={dish.isSpicy}
-              onAddToCart={handleAddToCart}
-            />
-          ))}
-        </div>
-      )}
-
-      <div className="order-summary" style={{ marginTop: '2rem', textAlign: 'center' }}>
-        <h3>Total Order: {orderTotal} ETB</h3>
-      </div>
-
-      <OrderForm />
+      <DishList 
+        dishes={filteredDishes} 
+        searchTerm={searchTerm} 
+      />
     </main>
   );
 };

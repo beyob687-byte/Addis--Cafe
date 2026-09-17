@@ -1,0 +1,9 @@
+[
+  { "id": 1, "name": "Doro Wat", "price": 350, "category": "Mains", "isSpicy": true },
+  { "id": 2, "name": "Kitfo", "price": 400, "category": "Mains", "isSpicy": true },
+  { "id": 3, "name": "Beyaynetu", "price": 250, "category": "Vegetarian", "isSpicy": false },
+  { "id": 4, "name": "Shiro", "price": 180, "category": "Vegetarian", "isSpicy": true },
+  { "id": 5, "name": "Tibs", "price": 380, "category": "Mains", "isSpicy": false },
+  { "id": 6, "name": "Injera", "price": 20, "category": "Sides", "isSpicy": false },
+  { "id": 7, "name": "Gomen", "price": 120, "category": "Vegetarian", "isSpicy": false }
+]
